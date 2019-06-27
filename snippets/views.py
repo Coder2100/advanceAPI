@@ -33,6 +33,14 @@ from rest_framework import permissions
 #object level permissions
 from snippets.permissions import IsOwnerOrReadOnly
 
+#Relationships & Hyperlinked APIs, Creating an endpoint for the root of our API
+from rest_framework.decorators import api_view
+from rest_framework.reverse import reverse
+
+#Creating an endpoint for the highlighted snippets
+from rest_framework import renderers
+
+
 #class based view
 # building our view using GenericAPIView, and adding in ListModelMixin and CreateModelMixin
 class SnippetList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
@@ -48,7 +56,7 @@ class SnippetList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.Gener
     
     def perform_create(self, serializer):
         serializer.save(owner=self.user)
-        
+
 class SnippetDetail(APIView):
     """
     Retrieve, update or delete a snippet instance.
@@ -90,6 +98,30 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                       IsOwnerOrReadOnly,)
    
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'snippets': reverse('snippet-list', request=request, format=format)
+    })
+
+#Creating an endpoint for the highlighted snippets
+class SnippetHighlight(generics.GenericAPIView):
+    queryset = Snippet.objects.all()
+    renderer_classes = (renderers.StaticHTMLRenderer,)
+    
+
+    def get(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
+
+
+
+
+
+
+
+
 
 
 
