@@ -41,6 +41,62 @@ from rest_framework.reverse import reverse
 from rest_framework import renderers
 
 
+
+#ViewSets & Routers
+from rest_framework import viewsets
+from rest_framework.decorators import action
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    #This viewset automatically provides `list` and `detail` actions.
+    queryset = User.objects.all()
+    serializer_clas=UserSerializer
+
+class SnippetViewSet(viewsets.ModelViewSet):
+    # This viewset automatically provides `list`, `create`, `retrieve`,`update` and `destroy` actions.
+
+    #Additionally we also provide an extra `highlight` action.
+
+    queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def highlight(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)    
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'snippets': reverse('snippet-list', request=request, format=format)
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 #class based view
 # building our view using GenericAPIView, and adding in ListModelMixin and CreateModelMixin
 class SnippetList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
@@ -58,9 +114,9 @@ class SnippetList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.Gener
         serializer.save(owner=self.user)
 
 class SnippetDetail(APIView):
-    """
-    Retrieve, update or delete a snippet instance.
-    """
+    
+   # Retrieve, update or delete a snippet instance.
+    
     def get_object(self, pk):
         try:
             return Snippet.objects.get(pk=pk)
@@ -116,24 +172,6 @@ class SnippetHighlight(generics.GenericAPIView):
         return Response(snippet.highlighted)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
 class SnippetList(APIView):
     #List all snippet, or create a new snippet
     def get(self, request, format=None):

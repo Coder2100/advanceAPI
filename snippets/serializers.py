@@ -23,7 +23,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('url', 'id', 'username', 'snippets')
 
-"""
 class UserSerializer(serializers.ModelSerializer):
     snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
     class Meta:
@@ -31,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
        # fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
        model = User
        field = ('id', 'username', 'snippets')
-
+"""
 #creating user serializer
 class SnippetSerializer(serializers.ModelSerializer):
 
