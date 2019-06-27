@@ -7,9 +7,14 @@ urlpatterns = [
     #function based views
    # path('snippets/', views.snippet_list),
     #path('snippets/<int:pk>/', views.snippet_detail),
+    
     # CLASS BASED URLS
     path('snippets/', views.SnippetList.as_view()),
     path('snippets/<int:pk>/', views.SnippetDetail.as_view()),
+
+    #class based urls views with authentication
+    path('users/', views.UserList.as_view()),
+    path('users/<int:pk>/', views.UserDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
